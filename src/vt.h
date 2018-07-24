@@ -22,5 +22,8 @@ void draw_player(position p);
 void clear_screen();
 void clamp_in_terminal(position *p);
 void get_terminal_dimensions(int *columns, int *lines);
+void restore_terminal();
+void set_terminal_nonblock();
+
 
 #endif /* VT_H */
