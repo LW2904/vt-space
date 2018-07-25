@@ -1,4 +1,4 @@
-#include "vt.h"
+#include "space.h"
 
 #include <time.h>
 #include <stdio.h>
@@ -19,15 +19,14 @@ int main()
 
 	set_terminal_nonblock();
 	get_terminal_dimensions(&term_w, &term_h);
-
-	float player_speed = 1;
-	position player_pos = { term_w * 0.5, term_h * 0.8 };
+	
+	player player = { 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
 
 	char c = 0;
 	int offset;
 
 	int projectile_i = 0;
-	position projectiles[MAX_PROJECTILES];
+	projectile projectiles[MAX_PROJECTILES];
 
 	while (1) {
 		clear_screen();
@@ -38,35 +37,44 @@ int main()
 		}
 
 		// If the key is uppercase...
-		offset = c > 64 && c < 91 ? 1 : 5;
+		offset = c > 64 && c < 91 ? 2 : 10;
 
 		switch (c) {
 		case 'w':
-		case 'W': player_pos.y -= offset;
+		case 'W': player.pos.y -= offset;
 			break;
 		case 'a':
-		case 'A': player_pos.x -= offset;
+		case 'A': player.pos.x -= offset;
 			break;
 		case 's':
-		case 'S': player_pos.y += offset;
+		case 'S': player.pos.y += offset;
 			break;
 		case 'd':
-		case 'D': player_pos.x += offset;
+		case 'D': player.pos.x += offset;
 			break;
-		case ' ': projectiles[projectile_i++] = player_pos;
+		case ' ': projectiles[projectile_i++] = (projectile){
+				1, 3, 2, { player.pos.x + 1, player.pos.y - 1 }
+			};
 			break;
 		}
 
 		projectile_i %= MAX_PROJECTILES - 1;
 
-		draw_player(player_pos);
+		draw_player(player);
 
 		for (int i = 0; i <= projectile_i; i++) {
-			
+			projectile *p = projectiles + i;
+
+			p->pos.y -= p->speed;
+
+			if (p->pos.y <= 0)
+				p->width = 0;
+
+			draw_projectile(*p);
 		}
 
 		cursor_move((position){ 0, 0 });
-		nanosleep((struct timespec[]){{ 0, 30000000L }}, NULL);
+		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
 	}
 
 	restore_terminal();
