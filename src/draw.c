@@ -29,3 +29,8 @@ void draw_player(position p)
 
 	draw_dot((position){ (p.x + 1) + xoff, (p.y - 1) + yoff });
 }
+
+void draw_projectile(position p)
+{
+	
+}

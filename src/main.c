@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#define MAX_PROJECTILES 16
+
 static inline int vertical_run(int runner, int min, int max);
 
 int term_h;
@@ -18,17 +20,16 @@ int main()
 	set_terminal_nonblock();
 	get_terminal_dimensions(&term_w, &term_h);
 
-	int player_speed = 1;
+	float player_speed = 1;
 	position player_pos = { term_w * 0.5, term_h * 0.8 };
 
 	char c = 0;
-	int frame = 0, offset;
+	int offset;
 
-	while (++frame) {
-		if (frame > 100) {
-			frame = 0;
-		}
+	int projectile_i = 0;
+	position projectiles[MAX_PROJECTILES];
 
+	while (1) {
 		clear_screen();
 
 		c = getchar();
@@ -36,6 +37,7 @@ int main()
 			break;
 		}
 
+		// If the key is uppercase...
 		offset = c > 64 && c < 91 ? 1 : 5;
 
 		switch (c) {
@@ -51,9 +53,17 @@ int main()
 		case 'd':
 		case 'D': player_pos.x += offset;
 			break;
+		case ' ': projectiles[projectile_i++] = player_pos;
+			break;
 		}
 
+		projectile_i %= MAX_PROJECTILES - 1;
+
 		draw_player(player_pos);
+
+		for (int i = 0; i <= projectile_i; i++) {
+			
+		}
 
 		cursor_move((position){ 0, 0 });
 		nanosleep((struct timespec[]){{ 0, 30000000L }}, NULL);
