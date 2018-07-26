@@ -58,3 +58,13 @@ void set_terminal_nonblock()
 
 	tcsetattr(0, TCSANOW, &new);
 }
+
+void print_centered(int y, char *string)
+{
+	cursor_move((position){
+		(term_w * 0.5) - (strlen(string) / 2),
+		y,
+	});
+
+	printf("%s", string);
+}

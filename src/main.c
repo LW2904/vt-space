@@ -239,7 +239,7 @@ void handle_loss()
 	sprintf(lbuf, "%d eliminations.", eliminated);
 
 	const int lines_num = 4;
-	const char *lines[lines_num];
+	char *lines[lines_num];
 
 	lines[0] = "You lost!";
 	lines[1] = lbuf;
@@ -247,12 +247,7 @@ void handle_loss()
 	lines[3] = "Press ENTER to quit...";
 
 	for (int i = 0; i < lines_num; i++) {
-		cursor_move((position){
-			(term_w * 0.5) - (strlen(lines[i]) / 2),
-			(term_h * 0.5) + (lines_num / 2) + i
-		});
-
-		printf("%s", lines[i]);
+		print_centered((term_h * 0.5) + (lines_num / 2) + i, lines[i]);
 	}
 
 	getchar();

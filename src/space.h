@@ -58,6 +58,8 @@ void get_terminal_dimensions(int *columns, int *lines);
 void restore_terminal();
 void set_terminal_nonblock();
 
+void print_centered(int y, char *string);
+
 static inline int remove_array_item(void *array, int index, int length,
 	size_t item_size)
 {
