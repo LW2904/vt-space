@@ -4,15 +4,10 @@
 
 #define DRAW_CHAR '#'
 
-static void draw_rectangle(position p, int width, int height, int filled);
+static inline void draw_dot(position p);
+static inline void draw_rectangle(position p, int width, int height, int filled);
 
-void draw_dot(position p)
-{
-	cursor_move(p);
-
-	putchar(DRAW_CHAR);
-}
-
+// TODO: This is ugly and doesn't respect custom witdh and height properly. 
 void draw_player(ship s)
 {
 	// Body.
@@ -41,7 +36,12 @@ void draw_projectile(projectile pr)
 	draw_rectangle(pr.pos, pr.width, pr.height, 1);
 }
 
-static void draw_rectangle(position p, int width, int height, int filled)
+void draw_enemy(enemy e)
+{
+	draw_rectangle(e.pos, e.width, e.height, 1);
+}
+
+static inline void draw_rectangle(position p, int width, int height, int filled)
 {
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < height; y++) {
@@ -52,4 +52,11 @@ static void draw_rectangle(position p, int width, int height, int filled)
 			}
 		}
 	}
+}
+
+static inline void draw_dot(position p)
+{
+	cursor_move(p);
+
+	putchar(DRAW_CHAR);
 }
