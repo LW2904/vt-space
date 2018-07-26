@@ -12,7 +12,6 @@
 void draw_status();
 
 static inline int run_frame();
-static inline int vertical_run(int runner, int min, int max);
 static inline int pos_inside(position p, position rp, int rw, int rh);
 
 static inline int remove_enemy(int index);
@@ -47,6 +46,7 @@ int main()
 	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
 
+	// Start near the bottom and in the center of the screen.
 	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
 
 	while (1) {
@@ -54,6 +54,7 @@ int main()
 			break;
 		}
 
+		// Sleep for 0.5s.
 		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
 	}
 
@@ -78,14 +79,10 @@ static inline int run_frame()
 	handle_enemies();
 
 	draw_status();
+	// Purely aesthetical.
 	cursor_move((position){ 0, 0 });	
 
 	return 0;
-}
-
-static inline int vertical_run(int runner, int min, int max)
-{
-	return runner >= max ? min + 1: runner <= min ? max - 1 : runner;
 }
 
 static inline int pos_inside(position p, position rp, int rw, int rh)
@@ -95,8 +92,7 @@ static inline int pos_inside(position p, position rp, int rw, int rh)
 
 static inline int remove_enemy(int index)
 {
-	return remove_array_item(enemies, index, enemies_len,
-		sizeof(enemy));
+	return remove_array_item(enemies, index, enemies_len, sizeof(enemy));
 }
 
 static inline int remove_projectile(int index)
@@ -192,6 +188,7 @@ void handle_enemies()
 	if (sc >= enemy_freq) {
 		sc = 0;
 
+		// Range: [10% of term, 90%]
 		int x = (rand() % term_w * 0.8) + term_w * 0.1;
 
 		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 } };
