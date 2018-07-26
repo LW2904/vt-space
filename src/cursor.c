@@ -10,7 +10,7 @@ void cursor_move(position p)
 
 	// Note the argument order since this expects "ESC line;column H"
 	// where line is equivalent to Y and column to X.
-	printf("\e[%d;%dH", p.y, p.x);
+	printf("%c[%d;%dH", ASCII_ESC, p.y, p.x);
 
 	current = p;
 }
@@ -24,10 +24,10 @@ void cursor_move_by(position delta)
 
 void cursor_hide()
 {
-	printf("\e[?25l");
+	printf("%c[?25l", ASCII_ESC);
 }
 
 void cursor_show()
 {
-	printf("[?25h");
+	printf("%c[?25h", ASCII_ESC);
 }

@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#define ASCII_ESC 27
+
 extern int term_w;
 extern int term_h;
 
@@ -62,10 +64,12 @@ static inline int remove_array_item(void *array, int index, int length,
 	size_t byte_offset = item_size * index;
 	size_t new_size = item_size * (length - index - 1);
 
-	memmove(array + byte_offset, array + byte_offset + item_size, new_size);
+    char *arr = (char *)array;
+
+	memmove(arr + byte_offset, arr + byte_offset + item_size, new_size);
 
 	return length - 1;
-};
+}
 
 
 #endif /* VT_H */
