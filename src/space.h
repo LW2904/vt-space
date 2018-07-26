@@ -64,7 +64,7 @@ static inline int remove_array_item(void *array, int index, int length,
 	size_t byte_offset = item_size * index;
 	size_t new_size = item_size * (length - index - 1);
 
-    char *arr = (char *)array;
+	char *arr = (char *)array;
 
 	memmove(arr + byte_offset, arr + byte_offset + item_size, new_size);
 
