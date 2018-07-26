@@ -17,7 +17,7 @@ static inline int pos_inside(position p, position rp, int rw, int rh);
 static inline int remove_enemy(int index);
 static inline int remove_projectile(int index);
 
-void handle_enemies();
+int handle_enemies();
 void handle_player(char c);
 void handle_projectiles(char c);
 void handle_projectile(int index);
@@ -76,7 +76,9 @@ static inline int run_frame()
 
 	handle_projectiles(c);
 
-	handle_enemies();
+	if ((handle_enemies()) == -1) {
+		return -1;
+	}
 
 	draw_status();
 	// Purely aesthetical.
@@ -104,7 +106,7 @@ static inline int remove_projectile(int index)
 void draw_status()
 {
 	cursor_move((position){ 0, 0 });
-	printf("\e[2K");
+	printf("%c[2K", ASCII_ESC);
 	cursor_move((position){ 0, 0 });
 
 	printf("enm: %d | prj: %d | %d / %d", enemies_len, projectiles_len,
@@ -177,7 +179,7 @@ void handle_projectile(int index)
 	draw_projectile(*p);
 }
 
-void handle_enemies()
+int handle_enemies()
 {
 	static int sc = 0;	// Spawn counter.
 	static int ic = 0;	// (Difficulty) Increase counter.
@@ -211,4 +213,6 @@ void handle_enemies()
 
 		draw_enemy(*e);
 	}
+
+	return 0;
 }
