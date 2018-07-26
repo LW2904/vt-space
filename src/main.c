@@ -22,6 +22,8 @@ void handle_player(char c);
 void handle_projectiles(char c);
 void handle_projectile(int index);
 
+void handle_loss();
+
 int term_h;
 int term_w;
 
@@ -35,6 +37,8 @@ enemy *enemies = NULL;
 int projectiles_len = 0;
 projectile *projectiles = NULL;
 
+int eliminated = 0;
+
 int main()
 {
 	// Disable stdout buffering.
@@ -42,6 +46,8 @@ int main()
 
 	set_terminal_nonblock();
 	get_terminal_dimensions(&term_w, &term_h);
+
+	cursor_hide();
 
 	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
@@ -59,6 +65,11 @@ int main()
 	}
 
 	restore_terminal();
+
+	handle_loss();
+
+	clear_screen();
+	cursor_show();
 
 	return 0;
 }
@@ -173,6 +184,8 @@ void handle_projectile(int index)
 		if (pos_inside(p->pos, e->pos, e->width, e->height)) {
 			enemies_len = remove_enemy(j);
 			projectiles_len = remove_projectile(index);
+
+			eliminated++;
 		}
 	}
 
@@ -193,7 +206,7 @@ int handle_enemies()
 		// Range: [10% of term, 90%]
 		int x = (rand() % term_w * 0.8) + term_w * 0.1;
 
-		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 } };
+		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 - 4} };
 	}
 
 	if (ic >= enemy_freq * 2) {
@@ -215,4 +228,32 @@ int handle_enemies()
 	}
 
 	return 0;
+}
+
+void handle_loss()
+{
+	clear_screen();
+
+	char *lbuf = malloc(sizeof(char) * 32);
+
+	sprintf(lbuf, "%d eliminations.", eliminated);
+
+	const int lines_num = 4;
+	const char *lines[lines_num];
+
+	lines[0] = "You lost!";
+	lines[1] = lbuf;
+	lines[2] = "";
+	lines[3] = "Press ENTER to quit...";
+
+	for (int i = 0; i < lines_num; i++) {
+		cursor_move((position){
+			(term_w * 0.5) - (strlen(lines[i]) / 2),
+			(term_h * 0.5) + (lines_num / 2) + i
+		});
+
+		printf("%s", lines[i]);
+	}
+
+	getchar();
 }
