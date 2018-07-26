@@ -13,27 +13,27 @@ void draw_dot(position p)
 	putchar(DRAW_CHAR);
 }
 
-void draw_player(player pl)
+void draw_player(ship s)
 {
 	// Body.
-	draw_rectangle(pl.pos, pl.width, pl.height, 1);
+	draw_rectangle(s.pos, s.width, s.height, 1);
 
 	// Snout.
-	draw_dot((position){ pl.pos.x + (pl.width / 2), pl.pos.y - 1 });
+	draw_dot((position){ s.pos.x + (s.width / 2), s.pos.y - 1 });
 
 	// Left wing.
-	draw_dot((position){ pl.pos.x - 1, pl.pos.y + 1 });
-	draw_dot((position){ pl.pos.x - 1, pl.pos.y + 2 });
+	draw_dot((position){ s.pos.x - 1, s.pos.y + 1 });
+	draw_dot((position){ s.pos.x - 1, s.pos.y + 2 });
 
-	draw_dot((position){ pl.pos.x - 2, pl.pos.y + 2 });
-	draw_dot((position){ pl.pos.x - 3, pl.pos.y + 2 });
+	draw_dot((position){ s.pos.x - 2, s.pos.y + 2 });
+	draw_dot((position){ s.pos.x - 3, s.pos.y + 2 });
 
 	// Right wing.
-	draw_dot((position){ pl.pos.x + pl.width, pl.pos.y + 1 });
-	draw_dot((position){ pl.pos.x + pl.width, pl.pos.y + 2 });
+	draw_dot((position){ s.pos.x + s.width, s.pos.y + 1 });
+	draw_dot((position){ s.pos.x + s.width, s.pos.y + 2 });
 
-	draw_dot((position){ pl.pos.x + pl.width + 1, pl.pos.y + 2 });
-	draw_dot((position){ pl.pos.x + pl.width + 2, pl.pos.y + 2 });
+	draw_dot((position){ s.pos.x + s.width + 1, s.pos.y + 2 });
+	draw_dot((position){ s.pos.x + s.width + 2, s.pos.y + 2 });
 }
 
 void draw_projectile(projectile pr)

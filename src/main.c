@@ -14,7 +14,7 @@ static inline int vertical_run(int runner, int min, int max);
 int term_h;
 int term_w;
 
-player ship = { 0 };
+ship player = { 0 };
 
 int projectile_len = 0;
 projectile *projectiles = NULL;
@@ -29,7 +29,7 @@ int main()
 
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
 
-	ship = (player){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
+	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
 
 	while (1) {
 		if ((run_frame()) == -1) {
@@ -58,19 +58,22 @@ static inline int run_frame()
 
 	switch (c) {
 	case 'w':
-	case 'W': ship.pos.y -= offset;
+	case 'W': player.pos.y -= offset;
 		break;
 	case 'a':
-	case 'A': ship.pos.x -= offset;
+	case 'A': player.pos.x -= offset;
 		break;
 	case 's':
-	case 'S': ship.pos.y += offset;
+	case 'S': player.pos.y += offset;
 		break;
 	case 'd':
-	case 'D': ship.pos.x += offset;
+	case 'D': player.pos.x += offset;
 		break;
 	case ' ': projectiles[projectile_len++] = (projectile){
-			1, 3, 2, { ship.pos.x + 1, ship.pos.y - 1 }
+			1, 3, 2, {
+				player.pos.x + player.width / 2,
+				player.pos.y - 1
+			}
 		};
 		break;
 	}
@@ -82,7 +85,7 @@ static inline int run_frame()
 		projectile_len--;
 	}
 
-	draw_player(ship);
+	draw_player(player);
 
 	for (int i = 0; i < projectile_len; i++) {
 		projectile *p = projectiles + i;
