@@ -1,1 +1,1 @@
-gcc src/*.c -lm -Wall
+gcc src/*.c -lm -Wall -Wpedantic
