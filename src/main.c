@@ -9,10 +9,19 @@
 #define MAX_ENEMIES 32
 #define MAX_PROJECTILES 16
 
+void draw_status();
+
 static inline int run_frame();
-static inline void draw_status();
 static inline int vertical_run(int runner, int min, int max);
 static inline int pos_inside(position p, position rp, int rw, int rh);
+
+static inline int remove_enemy(int index);
+static inline int remove_projectile(int index);
+
+void handle_enemies();
+void handle_player(char c);
+void handle_projectiles(char c);
+void handle_projectile(int index);
 
 int term_h;
 int term_w;
@@ -62,100 +71,11 @@ static inline int run_frame()
 		return -1;
 	}
 
-	// If the key is uppercase...
-	int offset = c > 64 && c < 91 ? 2 : 10;
+	handle_player(c);
 
-	switch (c) {
-	case 'w':
-	case 'W': player.pos.y -= offset;
-		break;
-	case 'a':
-	case 'A': player.pos.x -= offset;
-		break;
-	case 's':
-	case 'S': player.pos.y += offset;
-		break;
-	case 'd':
-	case 'D': player.pos.x += offset;
-		break;
-	case ' ': projectiles[projectiles_len++] = (projectile){
-			1, 3, 2, {
-				player.pos.x + player.width / 2,
-				player.pos.y - 1
-			}
-		};
-		break;
-	}
+	handle_projectiles(c);
 
-	if (projectiles_len >= MAX_PROJECTILES) {
-		(void)remove_array_item(projectiles, 0, projectiles_len,
-			sizeof(projectile));
-
-		projectiles_len--;
-	}
-
-	draw_player(player);
-
-	static int fc = 0;
-	static int ic = 0;
-
-	fc++;
-	ic++;
-
-	if (fc >= enemy_freq) {
-		fc = 0;
-
-		int x = (rand() % term_w * 0.8) + term_w * 0.1;
-
-		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 } };
-	}
-
-	if (ic >= enemy_freq * 5) {
-		ic = 0;
-
-		enemy_freq -= 5;
-	}
-
-	for (int i = 0; i < enemies_len; i++) {
-		enemy *e = enemies + i;
-
-		e->pos.y += e->speed;
-
-		if (e->pos.y >= term_h) {
-			return -1;
-		}
-
-		draw_enemy(*e);
-	}
-
-	for (int i = 0; i < projectiles_len; i++) {
-		projectile *p = projectiles + i;
-
-		p->pos.y -= p->speed;
-
-		if (p->pos.y <= 0) {
-			(void)remove_array_item(projectiles, i, projectiles_len,
-				sizeof(projectile));
-
-			projectiles_len--;
-
-			continue;
-		}
-
-		for (int j = 0; j < enemies_len; j++) {
-			enemy *e = enemies + j;
-
-			if (pos_inside(p->pos, e->pos, e->width, e->height)) {
-				enemies_len = remove_array_item(enemies, j,
-					enemies_len, sizeof(enemy));
-
-				projectiles_len = remove_array_item(projectiles,
-					i, projectiles_len, sizeof(projectile));
-			}
-		}
-
-		draw_projectile(*p);
-	}
+	handle_enemies();
 
 	draw_status();
 	cursor_move((position){ 0, 0 });	
@@ -173,7 +93,19 @@ static inline int pos_inside(position p, position rp, int rw, int rh)
 	return p.x >= rp.x && p.x <= rp.x + rw && p.y >= rp.y && p.y <= rp.y + rh;
 }
 
-static inline void draw_status()
+static inline int remove_enemy(int index)
+{
+	return remove_array_item(enemies, index, enemies_len,
+		sizeof(enemy));
+}
+
+static inline int remove_projectile(int index)
+{
+	return remove_array_item(projectiles, index, projectiles_len,
+		sizeof(projectile));
+}
+
+void draw_status()
 {
 	cursor_move((position){ 0, 0 });
 	printf("\e[2K");
@@ -181,4 +113,105 @@ static inline void draw_status()
 
 	printf("enm: %d | prj: %d | %d / %d", enemies_len, projectiles_len,
 		player.pos.x, player.pos.y);
+}
+
+void handle_player(char c)
+{
+	// If the key is uppercase...
+	int offset = c > 64 && c < 91 ? 2 : 10;
+
+	switch (c) {
+	case 'w':
+	case 'W': player.pos.y -= offset;
+		break;
+	case 'a':
+	case 'A': player.pos.x -= offset;
+		break;
+	case 's':
+	case 'S': player.pos.y += offset;
+		break;
+	case 'd':
+	case 'D': player.pos.x += offset;
+		break;
+	}
+
+	draw_player(player);
+}
+
+void handle_projectiles(char c)
+{
+	if (c == ' ') {
+		position proj_pos = {
+			player.pos.x + player.width / 2, player.pos.y - 1
+		};
+
+		projectiles[projectiles_len++] = (projectile){
+			1, 3, 2, proj_pos
+		};
+	}
+
+	if (projectiles_len >= MAX_PROJECTILES) {
+		projectiles_len = remove_projectile(0);
+	}
+
+	for (int i = 0; i < projectiles_len; i++) {
+		handle_projectile(i);
+	}
+}
+
+void handle_projectile(int index)
+{
+	projectile *p = projectiles + index;
+
+	p->pos.y -= p->speed;
+
+	if (p->pos.y <= 0) {
+		projectiles_len = remove_projectile(index);
+	}
+
+	for (int j = 0; j < enemies_len; j++) {
+		enemy *e = enemies + j;
+
+		if (pos_inside(p->pos, e->pos, e->width, e->height)) {
+			enemies_len = remove_enemy(j);
+			projectiles_len = remove_projectile(index);
+		}
+	}
+
+	draw_projectile(*p);
+}
+
+void handle_enemies()
+{
+	static int sc = 0;	// Spawn counter.
+	static int ic = 0;	// (Difficulty) Increase counter.
+
+	sc++;
+	ic++;
+
+	if (sc >= enemy_freq) {
+		sc = 0;
+
+		int x = (rand() % term_w * 0.8) + term_w * 0.1;
+
+		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 } };
+	}
+
+	if (ic >= enemy_freq * 2) {
+		ic = 0;
+
+		enemy_freq -= 2;
+	}
+
+	for (int i = 0; i < enemies_len; i++) {
+		enemy *e = enemies + i;
+
+		e->pos.y += e->speed;
+
+		if (e->pos.y >= term_h) {
+			return -1;
+		}
+
+		draw_enemy(*e);
+	}
 }
