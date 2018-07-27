@@ -180,8 +180,9 @@ void handle_projectiles(char c)
 		};
 	}
 
-	if (projectiles_len >= MAX_PROJECTILES) {
-		projectiles_len = remove_projectile(0);
+	for (int i = 0; i <= projectiles_len - MAX_PROJECTILES; i++) {
+		projectiles_len = remove_projectile(i);
+		
 	}
 
 	for (int i = 0; i < projectiles_len; i++) {
