@@ -3,8 +3,6 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <string.h>
 
 #define MAX_ENEMIES 32
 #define MAX_PROJECTILES 16
@@ -23,6 +21,7 @@ void handle_projectiles(char c);
 void handle_projectile(int index);
 
 void handle_loss();
+void handle_pause();
 
 int term_h;
 int term_w;
@@ -38,6 +37,8 @@ int projectiles_len = 0;
 projectile *projectiles = NULL;
 
 int eliminated = 0;
+
+int paused = 0;
 
 int main()
 {
@@ -55,8 +56,10 @@ int main()
 	// Start near the bottom and in the center of the screen.
 	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
 
+	int exit_status = 0;
+
 	while (1) {
-		if ((run_frame()) == -1) {
+		if ((exit_status = run_frame()) < 0) {
 			break;
 		}
 
@@ -66,7 +69,9 @@ int main()
 
 	restore_terminal();
 
-	handle_loss();
+	if (exit_status == -1) {
+		handle_loss();		
+	}
 
 	clear_screen();
 	cursor_show();
@@ -77,10 +82,20 @@ int main()
 static inline int run_frame()
 {
 	clear_screen();
+	draw_status();
 
 	char c = getchar();
-	if (c == 'q') {
-		return -1;
+	switch (c) {
+	case 'q': return -2;
+		break;
+	case 'p': paused = paused ? 0 : 1;
+		break;
+	}
+
+	if (paused) {
+		handle_pause();
+
+		return 0;
 	}
 
 	handle_player(c);
@@ -91,7 +106,6 @@ static inline int run_frame()
 		return -1;
 	}
 
-	draw_status();
 	// Purely aesthetical.
 	cursor_move((position){ 0, 0 });	
 
@@ -117,7 +131,7 @@ static inline int remove_projectile(int index)
 void draw_status()
 {
 	cursor_move((position){ 0, 0 });
-	printf("%c[2K", ASCII_ESC);
+	clear_line(0);
 	cursor_move((position){ 0, 0 });
 
 	printf("enm: %d | prj: %d | %d / %d", enemies_len, projectiles_len,
@@ -251,4 +265,20 @@ void handle_loss()
 	}
 
 	getchar();
+}
+
+void handle_pause()
+{
+	const int lines_num = 3;
+	char *lines[lines_num];
+
+	lines[0] = "Game paused.";
+	lines[1] = "";
+	lines[2] = "Press p to continue...";
+
+	for (int i = 0; i < lines_num; i++) {
+		int y = (term_h * 0.5) + (lines_num / 2) + i;
+
+		print_centered(y, lines[i]);
+	}
 }
