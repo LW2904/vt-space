@@ -1,1 +1,1 @@
-gcc src/*.c -lm -Wall -Wpedantic
+gcc src/*.c -lm -Wall -Wpedantic -o space
