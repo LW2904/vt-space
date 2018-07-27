@@ -4,11 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_ENEMIES 32
-#define MAX_PROJECTILES 16
-
 #define STATUS_FAIL -1
 #define STATUS_QUIT -2
+
+#define MAX_ENEMIES 32
+#define MAX_PROJECTILES 16
 
 void print_help();
 void draw_status();
@@ -84,9 +84,6 @@ int main()
 
 static inline int run_frame()
 {
-	clear_screen();
-	draw_status();
-
 	char c = getchar();
 	switch (c) {
 	case 'q': return STATUS_QUIT;
@@ -100,6 +97,9 @@ static inline int run_frame()
 
 		return 0;
 	}
+	
+	clear_screen();
+	draw_status();
 
 	if (!eliminated) {
 		print_help();
@@ -292,13 +292,14 @@ void handle_pause()
 
 void print_help()
 {
-	const int lines_num = 4;
+	const int lines_num = 5;
 	char *lines[lines_num];
 
 	lines[0] = "WASD to move your spacecraft.";
-	lines[1] = "Space to shoot.";
-	lines[2] = "";
-	lines[3] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
+	lines[1] = "Shift for precise movement.";
+	lines[2] = "Space to shoot.";
+	lines[3] = "";
+	lines[4] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
 
 	for (int i = 0; i < lines_num; i++) {
 		int y = (term_h * 0.5) + (lines_num / 2) + i;
