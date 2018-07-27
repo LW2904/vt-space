@@ -14,7 +14,14 @@ struct termios inital_settings;
 
 void clear_screen()
 {
+	cursor_move((position){ 0, 0 });
 	printf("%c[2J", ASCII_ESC);
+}
+
+void clear_line(int y)
+{
+	cursor_move((position){ 0, y });
+	printf("%d[2K", ASCII_ESC);
 }
 
 void get_terminal_dimensions(int *columns, int *lines)

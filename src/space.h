@@ -52,6 +52,7 @@ void draw_projectile(projectile pr);
 
 /* utility functions */
 void clear_screen();
+void clear_line(int y);
 void clamp_in_terminal(position *p);
 void get_terminal_dimensions(int *columns, int *lines);
 
