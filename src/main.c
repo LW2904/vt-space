@@ -7,21 +7,25 @@
 #define MAX_ENEMIES 32
 #define MAX_PROJECTILES 16
 
+#define STATUS_FAIL -1
+#define STATUS_QUIT -2
+
+void print_help();
 void draw_status();
 
-static inline int run_frame();
-static inline int pos_inside(position p, position rp, int rw, int rh);
-
-static inline int remove_enemy(int index);
-static inline int remove_projectile(int index);
+void handle_loss();
+void handle_pause();
 
 int handle_enemies();
 void handle_player(char c);
 void handle_projectiles(char c);
 void handle_projectile(int index);
 
-void handle_loss();
-void handle_pause();
+static inline int remove_enemy(int index);
+static inline int remove_projectile(int index);
+
+static inline int run_frame();
+static inline int pos_inside(position p, position rp, int rw, int rh);
 
 int term_h;
 int term_w;
@@ -29,16 +33,15 @@ int term_w;
 ship player = { 0 };
 
 int enemy_freq = 40;
-
 int enemies_len = 0;
 enemy *enemies = NULL;
 
 int projectiles_len = 0;
 projectile *projectiles = NULL;
 
-int eliminated = 0;
-
 int paused = 0;
+
+int eliminated = 0;
 
 int main()
 {
@@ -56,10 +59,10 @@ int main()
 	// Start near the bottom and in the center of the screen.
 	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
 
-	int exit_status = 0;
+	int frame_status = 0;
 
 	while (1) {
-		if ((exit_status = run_frame()) < 0) {
+		if ((frame_status = run_frame()) < 0) {
 			break;
 		}
 
@@ -69,7 +72,7 @@ int main()
 
 	restore_terminal();
 
-	if (exit_status == -1) {
+	if (frame_status == STATUS_FAIL) {
 		handle_loss();		
 	}
 
@@ -86,7 +89,7 @@ static inline int run_frame()
 
 	char c = getchar();
 	switch (c) {
-	case 'q': return -2;
+	case 'q': return STATUS_QUIT;
 		break;
 	case 'p': paused = paused ? 0 : 1;
 		break;
@@ -98,12 +101,16 @@ static inline int run_frame()
 		return 0;
 	}
 
+	if (!eliminated) {
+		print_help();
+	}
+
 	handle_player(c);
 
 	handle_projectiles(c);
 
-	if ((handle_enemies()) == -1) {
-		return -1;
+	if ((handle_enemies()) == STATUS_FAIL) {
+		return STATUS_FAIL;
 	}
 
 	// Purely aesthetical.
@@ -134,8 +141,8 @@ void draw_status()
 	clear_line(0);
 	cursor_move((position){ 0, 0 });
 
-	printf("enm: %d | prj: %d | %d / %d", enemies_len, projectiles_len,
-		player.pos.x, player.pos.y);
+	printf("enm: %d | prj: %d | %d / %d | [q]uit, [p]ause",
+		enemies_len, projectiles_len, player.pos.x, player.pos.y);
 }
 
 void handle_player(char c)
@@ -235,7 +242,7 @@ int handle_enemies()
 		e->pos.y += e->speed;
 
 		if (e->pos.y >= term_h) {
-			return -1;
+			return STATUS_FAIL;
 		}
 
 		draw_enemy(*e);
@@ -275,6 +282,23 @@ void handle_pause()
 	lines[0] = "Game paused.";
 	lines[1] = "";
 	lines[2] = "Press p to continue...";
+
+	for (int i = 0; i < lines_num; i++) {
+		int y = (term_h * 0.5) + (lines_num / 2) + i;
+
+		print_centered(y, lines[i]);
+	}
+}
+
+void print_help()
+{
+	const int lines_num = 4;
+	char *lines[lines_num];
+
+	lines[0] = "WASD to move your spacecraft.";
+	lines[1] = "Space to shoot.";
+	lines[2] = "";
+	lines[3] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
 
 	for (int i = 0; i < lines_num; i++) {
 		int y = (term_h * 0.5) + (lines_num / 2) + i;
