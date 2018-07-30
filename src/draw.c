@@ -45,6 +45,7 @@ static inline void draw_rectangle(position p, int width, int height, int filled)
 {
 	for (int x = 0; x < width; x++) {
 		for (int y = 0; y < height; y++) {
+			// TODO: Just look at it.
 			if (filled || x == 0 || x == width - 1 || y == 0
 				|| y == height - 1)
 			{

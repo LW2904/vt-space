@@ -170,6 +170,7 @@ void handle_player(char c)
 
 void handle_projectiles(char c)
 {
+	// If space was pressed, spawn a new projectile.
 	if (c == ' ') {
 		position proj_pos = {
 			player.pos.x + player.width / 2, player.pos.y - 1
@@ -180,6 +181,7 @@ void handle_projectiles(char c)
 		};
 	}
 
+	// Remove oldest projectile(s) if there are too many.
 	for (int i = 0; i <= projectiles_len - MAX_PROJECTILES; i++) {
 		projectiles_len = remove_projectile(i);
 		
@@ -196,6 +198,7 @@ void handle_projectile(int index)
 
 	p->pos.y -= p->speed;
 
+	// If projectile moved out of screen, remove it.
 	if (p->pos.y <= 0) {
 		projectiles_len = remove_projectile(index);
 	}
@@ -203,6 +206,7 @@ void handle_projectile(int index)
 	for (int j = 0; j < enemies_len; j++) {
 		enemy *e = enemies + j;
 
+		// If projectile is inside of an enemy, remove both.
 		if (pos_inside(p->pos, e->pos, e->width, e->height)) {
 			enemies_len = remove_enemy(j);
 			projectiles_len = remove_projectile(index);
