@@ -53,6 +53,7 @@ void draw_projectile(projectile pr);
 /* utility functions */
 void clear_screen();
 void clear_line(int y);
+
 void clamp_in_terminal(position *p);
 void get_terminal_dimensions(int *columns, int *lines);
 
@@ -60,19 +61,14 @@ void restore_terminal();
 void set_terminal_nonblock();
 
 void print_centered(int y, char *string);
+void print_centered_block(char **lines, int lines_num);
 
-static inline int remove_array_item(void *array, int index, int length,
-	size_t item_size)
+int remove_array_item(void *array, int index, int length, size_t item_size);
+
+static inline int pos_inside(position p, position rp, int rw, int rh)
 {
-	size_t byte_offset = item_size * index;
-	size_t new_size = item_size * (length - index - 1);
-
-	char *arr = (char *)array;
-
-	memmove(arr + byte_offset, arr + byte_offset + item_size, new_size);
-
-	return length - 1;
+	return 	p.x >= rp.x && p.x <= rp.x + rw &&
+		p.y >= rp.y && p.y <= rp.y + rh;
 }
-
 
 #endif /* VT_H */

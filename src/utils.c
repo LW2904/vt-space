@@ -39,11 +39,6 @@ void clamp_in_terminal(position *p)
 	p->y = clamp_inside(p->y, 0, term_h);	
 }
 
-static inline int clamp_inside(int target, int min, int max)
-{
-	return target < min ? min : target > max ? max : target;
-}
-
 void restore_terminal()
 {
 	tcsetattr(0, TCSANOW, &inital_settings);
@@ -74,4 +69,30 @@ void print_centered(int y, char *string)
 	});
 
 	printf("%s", string);
+}
+
+void print_centered_block(char **lines, int lines_num)
+{
+	for (int i = 0; i < lines_num; i++) {
+		int y = (term_h * 0.5) - (lines_num / 2) + i;
+
+		print_centered(y, lines[i]);
+	}
+}
+
+int remove_array_item(void *array, int index, int length, size_t item_size)
+{
+	size_t byte_offset = item_size * index;
+	size_t new_size = item_size * (length - index - 1);
+
+	char *arr = (char *)array;
+
+	memmove(arr + byte_offset, arr + byte_offset + item_size, new_size);
+
+	return length - 1;
+}
+
+static inline int clamp_inside(int target, int min, int max)
+{
+	return target < min ? min : target > max ? max : target;
 }

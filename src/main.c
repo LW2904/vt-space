@@ -41,7 +41,7 @@ projectile *projectiles = NULL;
 
 int paused = 0;
 
-int eliminated = 0;
+int eliminations = 0;
 
 int main()
 {
@@ -70,11 +70,11 @@ int main()
 		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
 	}
 
-	restore_terminal();
-
 	if (frame_status == STATUS_FAIL) {
 		handle_loss();		
 	}
+
+	restore_terminal();
 
 	clear_screen();
 	cursor_show();
@@ -101,7 +101,7 @@ static inline int run_frame()
 	clear_screen();
 	draw_status();
 
-	if (!eliminated) {
+	if (!eliminations) {
 		print_help();
 	}
 
@@ -113,15 +113,7 @@ static inline int run_frame()
 		return STATUS_FAIL;
 	}
 
-	// Purely aesthetical.
-	cursor_move((position){ 0, 0 });	
-
 	return 0;
-}
-
-static inline int pos_inside(position p, position rp, int rw, int rh)
-{
-	return p.x >= rp.x && p.x <= rp.x + rw && p.y >= rp.y && p.y <= rp.y + rh;
 }
 
 static inline int remove_enemy(int index)
@@ -184,7 +176,6 @@ void handle_projectiles(char c)
 	// Remove oldest projectile(s) if there are too many.
 	for (int i = 0; i <= projectiles_len - MAX_PROJECTILES; i++) {
 		projectiles_len = remove_projectile(i);
-		
 	}
 
 	for (int i = 0; i < projectiles_len; i++) {
@@ -211,7 +202,7 @@ void handle_projectile(int index)
 			enemies_len = remove_enemy(j);
 			projectiles_len = remove_projectile(index);
 
-			eliminated++;
+			eliminations++;
 		}
 	}
 
@@ -262,7 +253,7 @@ void handle_loss()
 
 	char *lbuf = malloc(sizeof(char) * 32);
 
-	sprintf(lbuf, "%d eliminations.", eliminated);
+	sprintf(lbuf, "%d eliminations.", eliminations);
 
 	const int lines_num = 4;
 	char *lines[lines_num];
@@ -270,13 +261,17 @@ void handle_loss()
 	lines[0] = "You lost!";
 	lines[1] = lbuf;
 	lines[2] = "";
-	lines[3] = "Press ENTER to quit...";
+	lines[3] = "[q]uit";
 
-	for (int i = 0; i < lines_num; i++) {
-		print_centered((term_h * 0.5) + (lines_num / 2) + i, lines[i]);
+	print_centered_block(lines, lines_num);
+
+	char c;
+	while ((c = getchar())) {
+		if (c == 'q')
+			break;
+
+		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
 	}
-
-	getchar();
 }
 
 void handle_pause()
@@ -288,11 +283,7 @@ void handle_pause()
 	lines[1] = "";
 	lines[2] = "Press p to continue...";
 
-	for (int i = 0; i < lines_num; i++) {
-		int y = (term_h * 0.5) + (lines_num / 2) + i;
-
-		print_centered(y, lines[i]);
-	}
+	print_centered_block(lines, lines_num);
 }
 
 void print_help()
@@ -306,9 +297,5 @@ void print_help()
 	lines[3] = "";
 	lines[4] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
 
-	for (int i = 0; i < lines_num; i++) {
-		int y = (term_h * 0.5) + (lines_num / 2) + i;
-
-		print_centered(y, lines[i]);
-	}
+	print_centered_block(lines, lines_num);
 }
