@@ -10,11 +10,14 @@
 #define MAX_ENEMIES 32
 #define MAX_PROJECTILES 16
 
+void start_game();
+
 void print_help();
 void draw_status();
 
 void handle_loss();
 void handle_pause();
+void handle_restart();
 
 int handle_enemies();
 void handle_player(char c);
@@ -56,28 +59,7 @@ int main()
 	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
 
-	// Start near the bottom and in the center of the screen.
-	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
-
-	int frame_status = 0;
-
-	while (1) {
-		if ((frame_status = run_frame()) < 0) {
-			break;
-		}
-
-		// Sleep for 0.5s.
-		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
-	}
-
-	if (frame_status == STATUS_FAIL) {
-		handle_loss();		
-	}
-
-	restore_terminal();
-
-	clear_screen();
-	cursor_show();
+	start_game();
 
 	return 0;
 }
@@ -125,6 +107,32 @@ static inline int remove_projectile(int index)
 {
 	return remove_array_item(projectiles, index, projectiles_len,
 		sizeof(projectile));
+}
+
+void start_game()
+{
+	// Start near the bottom and in the center of the screen.
+	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
+
+	int frame_status = 0;
+
+	while (1) {
+		if ((frame_status = run_frame()) < 0) {
+			break;
+		}
+
+		// Sleep for 0.5s.
+		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
+	}
+
+	if (frame_status == STATUS_FAIL) {
+		handle_loss();		
+	}
+
+	restore_terminal();
+
+	clear_screen();
+	cursor_show();
 }
 
 void draw_status()
@@ -261,14 +269,19 @@ void handle_loss()
 	lines[0] = "You lost!";
 	lines[1] = lbuf;
 	lines[2] = "";
-	lines[3] = "[q]uit";
+	lines[3] = "[q]uit, [r]estart";
 
 	print_centered_block(lines, lines_num);
 
 	char c;
 	while ((c = getchar())) {
-		if (c == 'q')
-			break;
+		switch (c) {
+		case 'q':
+			return;
+		case 'r':
+			handle_restart();
+			return;
+		}
 
 		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
 	}
@@ -298,4 +311,19 @@ void print_help()
 	lines[4] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
 
 	print_centered_block(lines, lines_num);
+}
+
+void handle_restart()
+{
+	// Reset difficulty.
+	enemy_freq = 40;
+
+	// Reset enemies and projectiles.
+	enemies_len = 0;
+	projectiles_len = 0;
+
+	paused = 0;
+	eliminations = 0;
+
+	start_game();
 }
