@@ -1,51 +1,56 @@
 #include "space.h"
 
 #include <stdio.h>
-#include <unistd.h>
-#include <termios.h>
-#include <sys/ioctl.h>
+
+#ifdef ON_LINUX
+  #include <unistd.h>
+  #include <termios.h>
+  #include <sys/ioctl.h>
+
+  struct termios inital_settings;
+#endif /* ON_LINUX */
+
+#ifdef ON_WINDOWS
+  #include <conio.h>
+  #include <windows.h>
+
+  #define ENABLE_VIRTUAL_TERMINAL_PROCESSING  0x0004
+#endif /* ON_WINDOWS */
 
 static inline int clamp_inside(int target, int min, int max);
 
 int term_w;
 int term_h;
 
-struct termios inital_settings;
-
-void clear_screen()
-{
-	cursor_move((position){ 0, 0 });
-	printf("%c[2J", ASCII_ESC);
-}
-
-void clear_line(int y)
-{
-	cursor_move((position){ 0, y });
-	printf("%d[2K", ASCII_ESC);
-}
-
 void get_terminal_dimensions(int *columns, int *lines)
 {
+#ifdef ON_LINUX
 	struct winsize w;
     	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
 	*lines = w.ws_row;
 	*columns = w.ws_col;
+#endif /* ON_LINUX */
+
+#ifdef ON_WINDOWS
+	CONSOLE_SCREEN_BUFFER_INFO screen;
+	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen);
+
+    	*lines = screen.srWindow.Bottom - screen.srWindow.Top + 1;
+	*columns = screen.srWindow.Right - screen.srWindow.Left + 1;
+#endif /* ON_WINDOWS */
 }
 
-void clamp_in_terminal(position *p)
+void terminal_restore()
 {
-	p->x = clamp_inside(p->x, 0, term_w);
-	p->y = clamp_inside(p->y, 0, term_h);	
-}
-
-void restore_terminal()
-{
+#ifdef ON_LINUX
 	tcsetattr(0, TCSANOW, &inital_settings);
+#endif /* ON_LINUX */
 }
 
-void set_terminal_nonblock()
+void terminal_setup()
 {
+#ifdef ON_LINUX
 	struct termios new;
 	tcgetattr(0, &inital_settings);
 
@@ -59,6 +64,59 @@ void set_terminal_nonblock()
 	new.c_cc[VTIME] = 0;
 
 	tcsetattr(0, TCSANOW, &new);
+#endif /* ON_LINUX */
+
+#ifdef ON_WINDOWS
+	DWORD mode;
+	HANDLE out;
+	
+	if ((out = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE) {
+		printf("GetStdHandle error: %ld\n", GetLastError());
+		return;
+	}
+
+	if (!GetConsoleMode(out, &mode)) {
+		printf("GetConsoleMode error: %ld\n", GetLastError());
+		return;
+	}
+
+	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	if (!SetConsoleMode(out, mode)) {
+		printf("SetConsoleMode error: %ld\n", GetLastError());
+	}
+#endif /* ON_WINDOWS */
+}
+
+char getchar_nonblock()
+{
+#ifdef ON_LINUX
+	return getchar();
+#endif /* ON_LINUX */
+
+#ifdef ON_WINDOWS
+	if (_kbhit())
+		return _getch();
+#endif /* ON_WINDOWS */
+
+	return EOF;
+}
+
+void clamp_in_terminal(position *p)
+{
+	p->x = clamp_inside(p->x, 0, term_w);
+	p->y = clamp_inside(p->y, 0, term_h);	
+}
+
+void clear_screen()
+{
+	cursor_move((position){ 0, 0 });
+	printf("%c[2J", ASCII_ESC);
+}
+
+void clear_line(int y)
+{
+	cursor_move((position){ 0, y });
+	printf("%d[2K", ASCII_ESC);
 }
 
 void print_centered(int y, char *string)

@@ -51,10 +51,10 @@ int main()
 	// Disable stdout buffering.
 	setbuf(stdout, NULL);
 
-	set_terminal_nonblock();
+	terminal_setup();
 	get_terminal_dimensions(&term_w, &term_h);
 
-	cursor_hide();
+	//cursor_hide();
 
 	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
@@ -64,9 +64,35 @@ int main()
 	return 0;
 }
 
+void start_game()
+{
+	// Start near the bottom and in the center of the screen.
+	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
+
+	int frame_status = 0;
+
+	while (1) {
+		if ((frame_status = run_frame()) < 0) {
+			break;
+		}
+
+		// Sleep for 0.5s.
+		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
+	}
+
+	if (frame_status == STATUS_FAIL) {
+		handle_loss();		
+	}
+
+	terminal_restore();
+
+	clear_screen();
+	cursor_show();
+}
+
 static inline int run_frame()
 {
-	char c = getchar();
+	char c = getchar_nonblock();
 	switch (c) {
 	case 'q': return STATUS_QUIT;
 		break;
@@ -107,32 +133,6 @@ static inline int remove_projectile(int index)
 {
 	return remove_array_item(projectiles, index, projectiles_len,
 		sizeof(projectile));
-}
-
-void start_game()
-{
-	// Start near the bottom and in the center of the screen.
-	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
-
-	int frame_status = 0;
-
-	while (1) {
-		if ((frame_status = run_frame()) < 0) {
-			break;
-		}
-
-		// Sleep for 0.5s.
-		nanosleep((struct timespec[]){{ 0, 50000000L }}, NULL);
-	}
-
-	if (frame_status == STATUS_FAIL) {
-		handle_loss();		
-	}
-
-	restore_terminal();
-
-	clear_screen();
-	cursor_show();
 }
 
 void draw_status()
@@ -274,7 +274,7 @@ void handle_loss()
 	print_centered_block(lines, lines_num);
 
 	char c;
-	while ((c = getchar())) {
+	while ((c = getchar_nonblock())) {
 		switch (c) {
 		case 'q':
 			return;

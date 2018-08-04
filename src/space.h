@@ -4,6 +4,14 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef _WIN32
+  #define ON_WINDOWS
+#endif /* _WIN32 */
+
+#ifdef __linux__
+  #define ON_LINUX
+#endif /* __linux__ */
+
 #define ASCII_ESC 27
 
 extern int term_w;
@@ -54,11 +62,13 @@ void draw_projectile(projectile pr);
 void clear_screen();
 void clear_line(int y);
 
+char getchar_nonblock();
+
 void clamp_in_terminal(position *p);
 void get_terminal_dimensions(int *columns, int *lines);
 
-void restore_terminal();
-void set_terminal_nonblock();
+void terminal_setup();
+void terminal_restore();
 
 void print_centered(int y, char *string);
 void print_centered_block(char **lines, int lines_num);
