@@ -54,7 +54,7 @@ int main()
 	terminal_setup();
 	get_terminal_dimensions(&term_w, &term_h);
 
-	//cursor_hide();
+	cursor_hide();
 
 	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
