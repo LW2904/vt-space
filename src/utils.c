@@ -33,8 +33,14 @@ void get_terminal_dimensions(int *columns, int *lines)
 #endif /* ON_LINUX */
 
 #ifdef ON_WINDOWS
+	DWORD access = GENERIC_READ | GENERIC_WRITE;
+	DWORD mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	HANDLE console = CreateFileW(L"CONOUT$", access, mode, NULL,
+		OPEN_EXISTING, 0, NULL);
+
 	CONSOLE_SCREEN_BUFFER_INFO screen;
-	GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &screen);
+	if (!GetConsoleScreenBufferInfo(console, &screen))
+		return;
 
     	*lines = screen.srWindow.Bottom - screen.srWindow.Top + 1;
 	*columns = screen.srWindow.Right - screen.srWindow.Left + 1;
