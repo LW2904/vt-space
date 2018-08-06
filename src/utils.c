@@ -73,21 +73,18 @@ void terminal_setup()
 #endif /* ON_LINUX */
 
 #ifdef ON_WINDOWS
-	DWORD mode;
-	HANDLE out;
-	
-	if ((out = GetStdHandle(STD_OUTPUT_HANDLE)) == INVALID_HANDLE_VALUE) {
-		printf("GetStdHandle error: %ld\n", GetLastError());
-		return;
-	}
+	DWORD access = GENERIC_READ | GENERIC_WRITE;
+	DWORD mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
+	HANDLE console = CreateFileW(L"CONOUT$", access, mode, NULL,
+		OPEN_EXISTING, 0, NULL);
 
-	if (!GetConsoleMode(out, &mode)) {
+	if (!GetConsoleMode(console, &mode)) {
 		printf("GetConsoleMode error: %ld\n", GetLastError());
 		return;
 	}
 
 	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(out, mode)) {
+	if (!SetConsoleMode(console, mode)) {
 		printf("SetConsoleMode error: %ld\n", GetLastError());
 	}
 #endif /* ON_WINDOWS */
