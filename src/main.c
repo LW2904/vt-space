@@ -234,10 +234,10 @@ int handle_enemies()
 		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 - 4} };
 	}
 
-	if (ic >= enemy_freq * 2) {
+	if (ic >= enemy_freq) {
 		ic = 0;
 
-		enemy_freq -= 2;
+		enemy_freq -= 1;
 	}
 
 	for (int i = 0; i < enemies_len; i++) {
