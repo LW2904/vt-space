@@ -12,8 +12,8 @@
 
 void start_game();
 
-void print_help();
 void draw_status();
+void print_help(int add_note);
 
 void handle_loss();
 void handle_pause();
@@ -92,12 +92,18 @@ void start_game()
 
 static inline int run_frame()
 {
+	static int standby = 1;
+
 	char c = getchar_nonblock();
 	switch (c) {
 	case 'q': return STATUS_QUIT;
 		break;
 	case 'p': paused = paused ? 0 : 1;
 		break;
+	}
+
+	if (c > 0) {
+		standby = 0;
 	}
 
 	if (paused) {
@@ -109,13 +115,18 @@ static inline int run_frame()
 	clear_screen();
 	draw_status();
 
-	if (!eliminations) {
-		print_help();
-	}
-
 	handle_player(c);
 
 	handle_projectiles(c);
+
+	if (standby) {
+		print_help(1);
+		return 0;
+	}
+
+	if (!eliminations) {
+		print_help(0);
+	}
 
 	if ((handle_enemies()) == STATUS_FAIL) {
 		return STATUS_FAIL;
@@ -299,9 +310,9 @@ void handle_pause()
 	print_centered_block(lines, lines_num);
 }
 
-void print_help()
+void print_help(int add_note)
 {
-	const int lines_num = 5;
+	const int lines_num = 7;
 	char *lines[lines_num];
 
 	lines[0] = "WASD to move your spacecraft.";
@@ -309,6 +320,8 @@ void print_help()
 	lines[2] = "Space to shoot.";
 	lines[3] = "";
 	lines[4] = "Don't let the evil rectangoloids reach the bottom of the scre- err, world!";
+	lines[5] = "";
+	lines[6] = add_note ? "Press any key to start." : "";
 
 	print_centered_block(lines, lines_num);
 }
