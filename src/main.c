@@ -281,6 +281,8 @@ void handle_loss()
 	lines[1] = lbuf;
 	lines[2] = "";
 	lines[3] = "[q]uit, [r]estart";
+	
+	free(lbuf);
 
 	print_centered_block(lines, lines_num);
 
