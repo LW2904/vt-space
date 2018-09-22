@@ -104,7 +104,7 @@ char getchar_nonblock()
 	return EOF;
 }
 
-void clamp_in_terminal(position *p)
+void clamp_in_terminal(struct position *p)
 {
 	p->x = clamp_inside(p->x, 0, term_w);
 	p->y = clamp_inside(p->y, 0, term_h);	
@@ -112,19 +112,19 @@ void clamp_in_terminal(position *p)
 
 void clear_screen()
 {
-	cursor_move((position){ 0, 0 });
+	cursor_move((struct position){ 0, 0 });
 	printf("%c[2J", ASCII_ESC);
 }
 
 void clear_line(int y)
 {
-	cursor_move((position){ 0, y });
+	cursor_move((struct position){ 0, y });
 	printf("%d[2K", ASCII_ESC);
 }
 
 void print_centered(int y, char *string)
 {
-	cursor_move((position){
+	cursor_move((struct position){
 		(term_w * 0.5) - (strlen(string) / 2),
 		y,
 	});

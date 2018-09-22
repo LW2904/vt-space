@@ -28,19 +28,20 @@ static inline int remove_enemy(int index);
 static inline int remove_projectile(int index);
 
 static inline int run_frame();
-static inline int pos_inside(position p, position rp, int rw, int rh);
+static inline int pos_inside(struct position p, struct position rp,
+	int rw, int rh);
 
 int term_h;
 int term_w;
 
-player player_ship = { 0 };
+struct player player_ship = { 0 };
 
 int enemy_freq = 40;
 int enemies_len = 0;
-enemy *enemies = NULL;
+struct enemy *enemies = NULL;
 
 int projectiles_len = 0;
-projectile *projectiles = NULL;
+struct projectile *projectiles = NULL;
 
 int paused = 0;
 
@@ -56,8 +57,8 @@ int main()
 
 	cursor_hide();
 
-	enemies = malloc(sizeof(enemy) * MAX_ENEMIES);
-	projectiles = malloc(sizeof(projectile) * MAX_PROJECTILES);
+	enemies = malloc(sizeof(struct enemy) * MAX_ENEMIES);
+	projectiles = malloc(sizeof(struct projectile) * MAX_PROJECTILES);
 
 	start_game();
 
@@ -67,9 +68,9 @@ int main()
 void start_game()
 {
 	// Start near the bottom and in the center of the screen.
-	position player_pos = { term_w * 0.5, term_h * 0.8 };
+	struct position player_pos = { term_w * 0.5, term_h * 0.8 };
 
-	player_ship = (player){ 3, 4, 1, player_pos };
+	player_ship = (struct player){ 3, 4, 1, player_pos };
 
 	int frame_status = 0;
 
@@ -139,20 +140,21 @@ static inline int run_frame()
 
 static inline int remove_enemy(int index)
 {
-	return remove_array_item(enemies, index, enemies_len, sizeof(enemy));
+	return remove_array_item(enemies, index, enemies_len,
+		sizeof(struct enemy));
 }
 
 static inline int remove_projectile(int index)
 {
 	return remove_array_item(projectiles, index, projectiles_len,
-		sizeof(projectile));
+		sizeof(struct projectile));
 }
 
 void draw_status()
 {
-	cursor_move((position){ 0, 0 });
+	cursor_move((struct position){ 0, 0 });
 	clear_line(0);
-	cursor_move((position){ 0, 0 });
+	cursor_move((struct position){ 0, 0 });
 
 	printf("enm: %d | prj: %d | %d / %d | [q]uit, [p]ause",
 		enemies_len, projectiles_len, player_ship.pos.x,
@@ -186,12 +188,12 @@ void handle_projectiles(char c)
 {
 	// If space was pressed, spawn a new projectile.
 	if (c == ' ') {
-		position proj_pos = {
+		struct position proj_pos = {
 			player_ship.pos.x + player_ship.width / 2,
 			player_ship.pos.y - 1
 		};
 
-		projectiles[projectiles_len++] = (projectile){
+		projectiles[projectiles_len++] = (struct projectile){
 			1, 3, 2, proj_pos
 		};
 	}
@@ -208,7 +210,7 @@ void handle_projectiles(char c)
 
 void handle_projectile(int index)
 {
-	projectile *p = projectiles + index;
+	struct projectile *p = projectiles + index;
 
 	p->pos.y -= p->speed;
 
@@ -218,7 +220,7 @@ void handle_projectile(int index)
 	}
 
 	for (int j = 0; j < enemies_len; j++) {
-		enemy *e = enemies + j;
+		struct enemy *e = enemies + j;
 
 		// If projectile is inside of an enemy, remove both.
 		if (pos_inside(p->pos, e->pos, e->width, e->height)) {
@@ -246,7 +248,7 @@ int handle_enemies()
 		// Range: [10% of term, 90%]
 		int x = (rand() % term_w * 0.8) + term_w * 0.1;
 
-		enemies[enemies_len++] = (enemy){ 4, 4, 1, { x, 0 - 4} };
+		enemies[enemies_len++] = (struct enemy){ 4, 4, 1, { x, 0 - 4} };
 	}
 
 	if (ic >= enemy_freq) {
@@ -256,7 +258,7 @@ int handle_enemies()
 	}
 
 	for (int i = 0; i < enemies_len; i++) {
-		enemy *e = enemies + i;
+		struct enemy *e = enemies + i;
 
 		e->pos.y += e->speed;
 

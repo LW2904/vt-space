@@ -2,9 +2,9 @@
 
 #include <stdio.h>
 
-position current;
+struct position current;
 
-void cursor_move(position p)
+void cursor_move(struct position p)
 {
 	clamp_in_terminal(&p);
 
@@ -15,9 +15,9 @@ void cursor_move(position p)
 	current = p;
 }
 
-void cursor_move_by(position delta)
+void cursor_move_by(struct position delta)
 {
-	position new_pos = { current.x + delta.x, current.y + delta.y };
+	struct position new_pos = { current.x + delta.x, current.y + delta.y };
 
 	cursor_move(new_pos);
 }

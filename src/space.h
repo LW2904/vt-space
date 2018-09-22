@@ -21,44 +21,40 @@ struct position {
     int x;
     int y;
 };
-typedef struct position position;
 
 struct player {
     int width;
     int height;
     float speed;
-    position pos;
+    struct position pos;
 };
-typedef struct player player;
 
 struct projectile {
     int width;
     int height;
     float speed;
-    position pos;
+    struct position pos;
 };
-typedef struct projectile projectile;
 
 struct enemy {
     int width;
     int height;
     float speed;
-    position pos;
+    struct position pos;
 };
-typedef struct enemy enemy;
 
 /* cursor operations */
 
 void cursor_hide();
 void cursor_show();
-void cursor_move(position p);
-void cursor_move_by(position delta);
+void cursor_move(struct position p);
+void cursor_move_by(struct position delta);
 
 /* draw functions */
 
-void draw_enemy(enemy e);
-void draw_player(player s);
-void draw_projectile(projectile pr);
+void draw_enemy(struct enemy e);
+void draw_player(struct player s);
+void draw_projectile(struct projectile pr);
 
 /* utility functions */
 
@@ -67,7 +63,7 @@ void clear_line(int y);
 
 char getchar_nonblock();
 
-void clamp_in_terminal(position *p);
+void clamp_in_terminal(struct position *p);
 void get_terminal_dimensions(int *columns, int *lines);
 
 void terminal_setup();
@@ -78,7 +74,8 @@ void print_centered_block(char **lines, int lines_num);
 
 int remove_array_item(void *array, int index, int length, size_t item_size);
 
-static inline int pos_inside(position p, position rp, int rw, int rh)
+static inline int pos_inside(struct position p, struct position rp,
+	int rw, int rh)
 {
 	return 	p.x >= rp.x && p.x <= rp.x + rw &&
 		p.y >= rp.y && p.y <= rp.y + rh;
