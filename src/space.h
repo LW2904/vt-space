@@ -56,8 +56,8 @@ void cursor_move_by(position delta);
 
 /* draw functions */
 
+void draw_ship(ship s);
 void draw_enemy(enemy e);
-void draw_player(ship s);
 void draw_projectile(projectile pr);
 
 /* utility functions */

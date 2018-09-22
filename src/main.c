@@ -67,7 +67,9 @@ int main()
 void start_game()
 {
 	// Start near the bottom and in the center of the screen.
-	player = (ship){ 3, 4, 1, { term_w * 0.5, term_h * 0.8 } };
+	position player_pos = { term_w * 0.5, term_h * 0.8 };
+
+	player = (ship){ 3, 4, 1, player_pos };
 
 	int frame_status = 0;
 
@@ -176,7 +178,7 @@ void handle_player(char c)
 		break;
 	}
 
-	draw_player(player);
+	draw_ship(player);
 }
 
 void handle_projectiles(char c)

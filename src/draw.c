@@ -8,7 +8,7 @@ static inline void draw_dot(position p);
 static inline void draw_rectangle(position p, int width, int height, int filled);
 
 // TODO: This is ugly and doesn't respect custom witdh and height properly. 
-void draw_player(ship s)
+void draw_ship(ship s)
 {
 	// Body.
 	draw_rectangle(s.pos, s.width, s.height, 1);
