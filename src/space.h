@@ -48,17 +48,20 @@ struct enemy {
 typedef struct enemy enemy;
 
 /* cursor operations */
+
 void cursor_hide();
 void cursor_show();
 void cursor_move(position p);
 void cursor_move_by(position delta);
 
 /* draw functions */
+
 void draw_enemy(enemy e);
 void draw_player(ship s);
 void draw_projectile(projectile pr);
 
 /* utility functions */
+
 void clear_screen();
 void clear_line(int y);
 
