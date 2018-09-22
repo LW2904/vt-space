@@ -33,7 +33,7 @@ static inline int pos_inside(position p, position rp, int rw, int rh);
 int term_h;
 int term_w;
 
-ship player = { 0 };
+player player_ship = { 0 };
 
 int enemy_freq = 40;
 int enemies_len = 0;
@@ -69,7 +69,7 @@ void start_game()
 	// Start near the bottom and in the center of the screen.
 	position player_pos = { term_w * 0.5, term_h * 0.8 };
 
-	player = (ship){ 3, 4, 1, player_pos };
+	player_ship = (player){ 3, 4, 1, player_pos };
 
 	int frame_status = 0;
 
@@ -155,7 +155,8 @@ void draw_status()
 	cursor_move((position){ 0, 0 });
 
 	printf("enm: %d | prj: %d | %d / %d | [q]uit, [p]ause",
-		enemies_len, projectiles_len, player.pos.x, player.pos.y);
+		enemies_len, projectiles_len, player_ship.pos.x,
+		player_ship.pos.y);
 }
 
 void handle_player(char c)
@@ -165,20 +166,20 @@ void handle_player(char c)
 
 	switch (c) {
 	case 'w':
-	case 'W': player.pos.y -= offset;
+	case 'W': player_ship.pos.y -= offset;
 		break;
 	case 'a':
-	case 'A': player.pos.x -= offset;
+	case 'A': player_ship.pos.x -= offset;
 		break;
 	case 's':
-	case 'S': player.pos.y += offset;
+	case 'S': player_ship.pos.y += offset;
 		break;
 	case 'd':
-	case 'D': player.pos.x += offset;
+	case 'D': player_ship.pos.x += offset;
 		break;
 	}
 
-	draw_ship(player);
+	draw_player(player_ship);
 }
 
 void handle_projectiles(char c)
@@ -186,7 +187,8 @@ void handle_projectiles(char c)
 	// If space was pressed, spawn a new projectile.
 	if (c == ' ') {
 		position proj_pos = {
-			player.pos.x + player.width / 2, player.pos.y - 1
+			player_ship.pos.x + player_ship.width / 2,
+			player_ship.pos.y - 1
 		};
 
 		projectiles[projectiles_len++] = (projectile){

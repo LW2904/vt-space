@@ -7,28 +7,29 @@
 static inline void draw_dot(position p);
 static inline void draw_rectangle(position p, int width, int height, int filled);
 
-// TODO: This is ugly and doesn't respect custom witdh and height properly. 
-void draw_ship(ship s)
+// Note that this function expects that p.width and p.height are set to the 
+// player dimension defines. 
+void draw_player(player p)
 {
 	// Body.
-	draw_rectangle(s.pos, s.width, s.height, 1);
+	draw_rectangle(p.pos, p.width, p.height, 1);
 
 	// Snout.
-	draw_dot((position){ s.pos.x + (s.width / 2), s.pos.y - 1 });
+	draw_dot((position){ p.pos.x + (p.width / 2), p.pos.y - 1 });
 
 	// Left wing.
-	draw_dot((position){ s.pos.x - 1, s.pos.y + 1 });
-	draw_dot((position){ s.pos.x - 1, s.pos.y + 2 });
+	draw_dot((position){ p.pos.x - 1, p.pos.y + 1 });
+	draw_dot((position){ p.pos.x - 1, p.pos.y + 2 });
 
-	draw_dot((position){ s.pos.x - 2, s.pos.y + 2 });
-	draw_dot((position){ s.pos.x - 3, s.pos.y + 2 });
+	draw_dot((position){ p.pos.x - 2, p.pos.y + 2 });
+	draw_dot((position){ p.pos.x - 3, p.pos.y + 2 });
 
 	// Right wing.
-	draw_dot((position){ s.pos.x + s.width, s.pos.y + 1 });
-	draw_dot((position){ s.pos.x + s.width, s.pos.y + 2 });
+	draw_dot((position){ p.pos.x + p.width, p.pos.y + 1 });
+	draw_dot((position){ p.pos.x + p.width, p.pos.y + 2 });
 
-	draw_dot((position){ s.pos.x + s.width + 1, s.pos.y + 2 });
-	draw_dot((position){ s.pos.x + s.width + 2, s.pos.y + 2 });
+	draw_dot((position){ p.pos.x + p.width + 1, p.pos.y + 2 });
+	draw_dot((position){ p.pos.x + p.width + 2, p.pos.y + 2 });
 }
 
 void draw_projectile(projectile pr)

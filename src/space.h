@@ -23,13 +23,13 @@ struct position {
 };
 typedef struct position position;
 
-struct ship {
+struct player {
     int width;
     int height;
     float speed;
     position pos;
 };
-typedef struct ship ship;
+typedef struct player player;
 
 struct projectile {
     int width;
@@ -56,8 +56,8 @@ void cursor_move_by(position delta);
 
 /* draw functions */
 
-void draw_ship(ship s);
 void draw_enemy(enemy e);
+void draw_player(player s);
 void draw_projectile(projectile pr);
 
 /* utility functions */
