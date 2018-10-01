@@ -60,9 +60,14 @@ int main()
 	enemies = malloc(sizeof(struct enemy) * MAX_ENEMIES);
 	projectiles = malloc(sizeof(struct projectile) * MAX_PROJECTILES);
 
+	if (!enemies || !projectiles) {
+		printf("malloc failed\n");
+		return EXIT_FAILURE;
+	}
+
 	start_game();
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 void start_game()
@@ -114,7 +119,7 @@ static inline int run_frame()
 
 		return 0;
 	}
-	
+
 	clear_screen();
 	draw_status();
 
