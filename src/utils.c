@@ -86,6 +86,7 @@ void terminal_setup()
 	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 	if (!SetConsoleMode(console, mode)) {
 		printf("SetConsoleMode error: %ld\n", GetLastError());
+		return;
 	}
 #endif /* ON_WINDOWS */
 }
