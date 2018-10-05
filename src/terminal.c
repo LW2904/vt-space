@@ -11,12 +11,12 @@ int get_terminal_dimensions(int *columns, int *lines)
 
 	CONSOLE_SCREEN_BUFFER_INFO screen;
 	if (!GetConsoleScreenBufferInfo(console, &screen))
-		return 0;
+		return GetLastError();
 
     	*lines = screen.srWindow.Bottom - screen.srWindow.Top + 1;
 	*columns = screen.srWindow.Right - screen.srWindow.Left + 1;
 
-	return 1;
+	return 0;
 }
 
 int setup_terminal()
@@ -27,19 +27,15 @@ int setup_terminal()
 		OPEN_EXISTING, 0, NULL);
 
 	/* Fetch original console mode */
-	if (!GetConsoleMode(console, &mode)) {
-		printf("GetConsoleMode error: %ld\n", GetLastError());
+	if (!GetConsoleMode(console, &mode))
 		return GetLastError();
-	}
 
 	/* Amend the mode to enable VT codes */
 	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
 	/* Apply the changes */
-	if (!SetConsoleMode(console, mode)) {
-		printf("SetConsoleMode error: %ld\n", GetLastError());
-		return -1;
-	}
+	if (!SetConsoleMode(console, mode))
+		return GetLastError();
 
 	return 0;
 }

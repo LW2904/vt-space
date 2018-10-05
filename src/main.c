@@ -6,7 +6,7 @@ int main()
 {
 	int err;
 
-	if (!(err = setup_terminal())) {
+	if ((err = setup_terminal())) {
 		printf("setup_terminal error: %d\n", err);
 		return -1;
 	}
@@ -14,7 +14,7 @@ int main()
 	clear_terminal();
 	
 	int term_w, term_h;
-	if (!(err = get_terminal_dimensions(&term_w, &term_h))) {
+	if ((err = get_terminal_dimensions(&term_w, &term_h))) {
 		printf("get_terminal_dimensions error: %d\n", err);
 		return -1;
 	}
