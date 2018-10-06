@@ -1,7 +1,5 @@
 #include "space.h"
 
-#include <stdio.h>
-
 int get_terminal_dimensions(int *columns, int *lines)
 {
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
