@@ -1,5 +1,10 @@
 #include "space.h"
 
+/* Polyfill for older API versions */
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+  #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+
 int get_terminal_dimensions(int *columns, int *lines)
 {
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
@@ -19,26 +24,28 @@ int get_terminal_dimensions(int *columns, int *lines)
 
 int setup_terminal()
 {
+
+
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 	HANDLE console = CreateFileW(L"CONOUT$", access, mode, NULL,
 		OPEN_EXISTING, 0, NULL);
 
-	/* Fetch original console mode */
-	if (!GetConsoleMode(console, &mode))
-		return GetLastError();
+	if (!GetConsoleMode(console, &mode)) {
+		printf("GetConsoleMode error: %ld\n", GetLastError());
+		return 1;
+	}
 
-	/* Amend the mode to enable VT codes */
 	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-
-	/* Apply the changes */
-	if (!SetConsoleMode(console, mode))
-		return GetLastError();
+	if (!SetConsoleMode(console, mode)) {
+		printf("SetConsoleMode error: %ld\n", GetLastError());
+		return 1;
+	}
 
 	return 0;
 }
 
-void clear_terminal()
+extern inline void clear_terminal()
 {
 	printf("%c[2J", ESC);
 }

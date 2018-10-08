@@ -15,12 +15,14 @@ int player_x, player_y;
 int num_projectiles = 0;
 struct projectile *projectiles = NULL;
 
-static inline void run_frame();
+void run_frame();
 
-static inline void handle_player(char c);
+void handle_player(char c);
 
-static inline void handle_projectiles(char c);
-static inline void handle_projectile(int index);
+void handle_projectile(int index);
+void handle_projectiles(char c);
+
+static inline void remove_projectile(int index);
 
 int main()
 {
@@ -61,14 +63,14 @@ int main()
 	return 0;
 }
 
-static inline void run_frame()
+void run_frame()
 {
 	char c = getchar_nonblock();
 
 	handle_player(c);
 }
 
-static inline void handle_player(char c)
+void handle_player(char c)
 {
 	/* If it's uppercase (ergo shift was held), use the small interval,
 	   else use default. */
@@ -96,7 +98,7 @@ static inline void handle_player(char c)
 	draw_ship(player_x, player_y);
 }
 
-static inline void handle_projectiles(char c)
+void handle_projectiles(char c)
 {
 	if (c == ' ') {
 		projectiles[num_projectiles++] = (struct projectile){
@@ -115,7 +117,7 @@ static inline void handle_projectiles(char c)
 	}
 }
 
-static inline void handle_projectile(int index)
+void handle_projectile(int index)
 {
 	struct projectile *p = projectiles + index;
 

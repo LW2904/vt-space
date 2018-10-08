@@ -39,14 +39,23 @@ int setup_terminal();
  */
 void clear_terminal();
 
+/* Moves the cursor to the given position.
+ */
+void move_cursor(int x, int y);
+
+/* Hides and reveals the cursor, respectively.
+ */
+void hide_cursor();
+void show_cursor();
+
 /* Nonblocking version of stdlib function getchar.
  */
-inline char getchar_nonblock();
+char getchar_nonblock();
 
 /* Make a given number "wrap around" if it is larger or smaller than the min or
  * max, respectively.
  */
-inline int wrap_around(int actual, int min, int max);
+int wrap_around(int actual, int min, int max);
 
 /* Removes an array item, moving the rest of the array "downwards".
  */

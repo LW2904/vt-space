@@ -1,6 +1,8 @@
 #include "space.h"
 
-inline char getchar_nonblock()
+#include <conio.h>
+
+extern inline char getchar_nonblock()
 {
 	/* If a key was pressed just now... */
 	if (_kbhit())
@@ -10,7 +12,7 @@ inline char getchar_nonblock()
 	return EOF;
 }
 
-inline int wrap_around(int actual, int min, int max)
+extern inline int wrap_around(int actual, int min, int max)
 {
 	if (actual < min)
 		return (min - actual) - max;
@@ -20,7 +22,8 @@ inline int wrap_around(int actual, int min, int max)
 	return actual;
 }
 
-int remove_array_item(void *array, int index, int length, size_t item_size)
+int remove_array_item(void *array, int index, int length,
+	size_t item_size)
 {
 	size_t byte_offset = item_size * index;
 	size_t new_size = item_size * (length - index - 1);
