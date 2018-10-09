@@ -7,10 +7,9 @@
 
 int get_terminal_dimensions(int *columns, int *lines)
 {
-	DWORD access = GENERIC_READ | GENERIC_WRITE;
-	DWORD mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-	HANDLE console = CreateFileW(L"CONOUT$", access, mode, NULL,
-		OPEN_EXISTING, 0, NULL);
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (console == INVALID_HANDLE_VALUE)
+		return GetLastError();
 
 	CONSOLE_SCREEN_BUFFER_INFO screen;
 	if (!GetConsoleScreenBufferInfo(console, &screen))
@@ -24,23 +23,17 @@ int get_terminal_dimensions(int *columns, int *lines)
 
 int setup_terminal()
 {
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (console == INVALID_HANDLE_VALUE)
+		return GetLastError();
 
-
-	DWORD access = GENERIC_READ | GENERIC_WRITE;
-	DWORD mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
-	HANDLE console = CreateFileW(L"CONOUT$", access, mode, NULL,
-		OPEN_EXISTING, 0, NULL);
-
-	if (!GetConsoleMode(console, &mode)) {
-		printf("GetConsoleMode error: %ld\n", GetLastError());
-		return 1;
-	}
+	DWORD mode;
+	if (!GetConsoleMode(console, &mode))
+		return GetLastError();
 
 	mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	if (!SetConsoleMode(console, mode)) {
-		printf("SetConsoleMode error: %ld\n", GetLastError());
-		return 1;
-	}
+	if (!SetConsoleMode(console, mode))
+		return GetLastError();
 
 	return 0;
 }
