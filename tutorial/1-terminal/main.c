@@ -4,6 +4,9 @@
 
 int main()
 {
+	/* Disable stdout buffering. */
+	setbuf(stdout, NULL);
+
 	int err;
 
 	if ((err = setup_terminal())) {
