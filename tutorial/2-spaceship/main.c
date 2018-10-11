@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#define FRAME_INTERVAL 75
+
 #define PLAYER_WIDTH 3
 #define PLAYER_HEIGHT 4
 
@@ -16,13 +18,12 @@ struct ship player;
 
 void run_frame();
 
+void handle_exit();
 void handle_player(char c);
-
-void handle_sigint();
 
 int main()
 {
-	/* Disable stdout buffering. */
+	/* Disable stdout buffering */
 	setbuf(stdout, NULL);
 
 	int err;
@@ -40,21 +41,22 @@ int main()
 	hide_cursor();
 	clear_terminal();
 
-	/* Catch Ctrl + C. */
-	signal(SIGINT, handle_sigint);
+	/* Catch Ctrl + C */
+	signal(SIGINT, handle_exit);
 
-	/* Start in the center and near the bottom of the screen. */
+	/* Start in the center and near the bottom of the screen */
 	player = (struct ship){ term_w * 0.5, term_h * 0.8,
 		PLAYER_WIDTH, PLAYER_HEIGHT };
 
 	while (1) {
 		run_frame();
 
-		Sleep(100);
+		Sleep(FRAME_INTERVAL);
 	}
 
-	show_cursor();
+	handle_exit();
 
+	/* This will never be reached */
 	return 0;
 }
 
@@ -74,16 +76,16 @@ void handle_player(char c)
 	int interval = c > 64 && c < 91 ? MOVEMENT_INTERVAL_DEFAULT :
 		MOVEMENT_INTERVAL_LARGE;
 
+	/* Intervals are normalized (in this case halved) for vertical movement,
+	   since monospace characters are usually around half as wide as they
+	   are tall. */
 	switch (c) {
-	/* Normalize movement distance, characters are taller than they are
-	   wide. */
 	case 'w':
 	case 'W': player.y -= interval / 2;
 		break;
 	case 'a':
 	case 'A': player.x -= interval;
 		break;
-	/* See above. */
 	case 's':
 	case 'S': player.y += interval / 2;
 		break;
@@ -98,9 +100,10 @@ void handle_player(char c)
 	draw_ship(player);
 }
 
-void handle_sigint()
+void handle_exit()
 {
 	show_cursor();
+	clear_terminal();
 
 	exit(0);
 }

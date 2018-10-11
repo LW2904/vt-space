@@ -7,7 +7,7 @@
  */
 static inline void draw_rectangle(int x, int y, int width, int height);
 
-/* Draws a dot at the given position
+/* Draws a dot at the given position.
  */
 static inline void draw_dot(int x, int y);
 

@@ -38,7 +38,7 @@ int setup_terminal()
 	return 0;
 }
 
-void clear_terminal()
+extern inline void clear_terminal()
 {
 	printf("%c[2J", ESC);
 }
