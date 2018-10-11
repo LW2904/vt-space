@@ -15,12 +15,6 @@ struct ship {
 	int height;
 };
 
-struct projectile {
-	int x;
-	int y;
-	int speed;
-};
-
 /* Fetches the dimensions in columns and lines (aka rows) of the current 
  * terminal window. Returns nonzero on failure.
  */
