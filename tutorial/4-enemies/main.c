@@ -5,6 +5,7 @@
 #include <signal.h>
 
 #define STATUS_FAIL -1
+#define STATUS_CONTNUE 0
 
 #define FRAME_INTERVAL 50
 
@@ -81,7 +82,7 @@ int main()
 		PLAYER_WIDTH, PLAYER_HEIGHT };
 
 	while (1) {
-		if (run_frame() != 0)
+		if (run_frame() != STATUS_CONTNUE)
 			break;
 
 		Sleep(FRAME_INTERVAL);
