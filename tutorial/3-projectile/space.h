@@ -41,7 +41,7 @@ void clear_terminal();
  */
 void draw_ship(struct ship player);
 
-/* Draws a projectile at the given position. Width and height are constant.
+/* Draws a projectile at the given position.
  */
 void draw_projectile(struct projectile p);
 
