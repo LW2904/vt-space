@@ -37,7 +37,10 @@ static inline void remove_projectile(int index);
 int main()
 {
 	/* Disable stdout buffering */
-	setbuf(stdout, NULL);
+	if (setvbuf(stdout, NULL, _IONBF, 0)) {
+		printf("error disabling stdout buffering\n");
+		return 1;
+	}
 
 	int err;
 

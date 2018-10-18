@@ -57,7 +57,10 @@ static inline int pos_inside(int x1, int y1, int x2, int y2, int w, int h);
 int main()
 {
 	/* Disable stdout buffering */
-	setbuf(stdout, NULL);
+	if (setvbuf(stdout, NULL, _IONBF, 0)) {
+		printf("error disabling stdout buffering\n");
+		return 1;
+	}
 
 	int err;
 

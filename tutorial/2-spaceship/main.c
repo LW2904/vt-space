@@ -24,7 +24,10 @@ void handle_player(char c);
 int main()
 {
 	/* Disable stdout buffering */
-	setbuf(stdout, NULL);
+	if (setvbuf(stdout, NULL, _IONBF, 0)) {
+		printf("error disabling stdout buffering\n");
+		return 1;
+	}
 
 	int err;
 

@@ -4,8 +4,11 @@
 
 int main()
 {
-	/* Disable stdout buffering. */
-	setbuf(stdout, NULL);
+	/* Disable stdout buffering */
+	if (setvbuf(stdout, NULL, _IONBF, 0)) {
+		printf("error disabling stdout buffering\n");
+		return 1;
+	}
 
 	int err;
 
