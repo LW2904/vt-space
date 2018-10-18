@@ -5,7 +5,7 @@
 #include <signal.h>
 
 #define STATUS_FAIL -1
-#define STATUS_CONTNUE 0
+#define STATUS_CONTINUE 0
 
 #define FRAME_INTERVAL 50
 
@@ -85,7 +85,7 @@ int main()
 		PLAYER_WIDTH, PLAYER_HEIGHT };
 
 	while (1) {
-		if (run_frame() != STATUS_CONTNUE)
+		if (run_frame() != STATUS_CONTINUE)
 			break;
 
 		Sleep(FRAME_INTERVAL);
@@ -114,7 +114,7 @@ int run_frame()
 	if (handle_enemies() == STATUS_FAIL)
 		return STATUS_FAIL;
 
-	return 0;
+	return STATUS_CONTINUE;
 }
 
 void handle_player(char c)
