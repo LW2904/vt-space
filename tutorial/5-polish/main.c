@@ -61,19 +61,19 @@ int main()
 	/* Disable stdout buffering */
 	if (setvbuf(stdout, NULL, _IONBF, 0)) {
 		printf("error disabling stdout buffering\n");
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	int err;
 
 	if ((err = setup_terminal())) {
 		printf("setup_terminal error: %d\n", err);
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	if ((err = get_terminal_dimensions(&term_w, &term_h))) {
 		printf("get_terminal_dimensions error: %d\n", err);
-		return 1;
+		return EXIT_FAILURE;
 	}
 
 	hide_cursor();
@@ -96,7 +96,7 @@ int main()
 	handle_exit();
 
 	/* This will never be reached */
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 int run_frame()
@@ -254,7 +254,7 @@ void handle_exit()
 	show_cursor();
 	clear_terminal();
 
-	exit(0);
+	exit(EXIT_SUCCESS);
 }
 
 void draw_status()
